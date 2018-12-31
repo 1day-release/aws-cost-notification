@@ -1,0 +1,25 @@
+service: aws-cost-notification
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: prd
+  region: us-east-1
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ce:GetCostAndUsage
+      Resource: "*"
+
+plugins:
+  - serverless-python-requirements
+
+functions:
+  CostNotification:
+    handler: CostNotification.main
+    environment:
+      SLACK_ACCESS_TOKEN: ${file(./slack_token.yml):ACCESS_TOKEN}
+    events:
+      - schedule: cron(0 0 * * ? *)
+    timeout: 30
